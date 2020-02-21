@@ -5,6 +5,7 @@ from tkinter import filedialog
 from datetime import datetime, timedelta
 import os
 from PIL import Image, ImageTk
+import re
 
 contacts = [
   {"phoneNumber":"555 0001","name":"Sheldon Lee Cooper","dateOfBirth":"1980-02-26","email":"sheldon@gmail.com"},
@@ -21,7 +22,7 @@ class AppWindow():
         # Create the window
         self.parent = parent
         self.window = tk.Toplevel()
-        self.window.geometry("670x350")
+        self.window.geometry("670x400")
         self.window.title("Contacts app")
         self.window.protocol("WM_DELETE_WINDOW", self.window.quit)
         # Create a text label and place it in the window
@@ -44,30 +45,39 @@ class AppWindow():
         self.email_text = tk.Entry(self.window, width=25)
         self.email_text.place(x=250,y=120)
         # Phone number
+        self.validate_command1 = parent.register(self.name_validate)
         self.phone_label = tk.Label(self.window, text="Phone", font=("Arial", 13))
         self.phone_label.place(x=250,y=160)
-        self.phone_text = tk.Entry(self.window, width=25)
+        self.phone_text = tk.Entry(self.window, width=25, validate="all", validatecommand=(self.validate_command1, "%P"))
         self.phone_text.place(x=250,y=180)
         # Date of birth
         self.dob_label = tk.Label(self.window, text="Date of birth", font=("Arial", 13))
-        self.dob_label.place(x=250,y=160)
+        self.dob_label.place(x=250,y=220)
         self.dob_text = tk.Entry(self.window, width=25)
-        self.dob_text.place(x=250,y=180)
+        self.dob_text.place(x=250,y=240)
         # Age
         self.age_label = tk.Label(self.window, text="Age", font=("Arial", 13))
-        self.age_label.place(x=250,y=220)
+        self.age_label.place(x=250,y=280)
         self.age_info = tk.Label(self.window, text="", font=("Arial", 13))
-        self.age_info.place(x=250,y=240)
+        self.age_info.place(x=250,y=300)
         # Photo
         self.image_label = tk.Label(self.window)
         self.image_label.place(x=500,y=40,width=150,height=200)
         # Buttons
         self.new_button = tk.Button(self.window, text="Save new", command=self.save_new)
-        self.new_button.place(x=250, y=280, width=100, height=40)
+        self.new_button.place(x=250, y=340, width=100, height=40)
         self.existing_button = tk.Button(self.window, text="Save existing", command=self.save_existing)
-        self.existing_button.place(x=370, y=280, width=100, height=40)
+        self.existing_button.place(x=370, y=340, width=100, height=40)
 
+
+    def name_validate(self, text_to_check):
+        print("Validating "+text_to_check)
+        return re.match("^([A-Za-z]{2}[0-9]{5})$", text_to_check)
+    
     def list_clicked(self, e):
+        if len(self.contact_list.curselection()) == 0:
+            return None
+        print(f"list_clicked: {self.contact_list.curselection()}")
         self.selected = int(self.contact_list.curselection()[0])      # item number selected in list
         print(f"You clicked item number {self.selected}")
         # Get the selected contact
